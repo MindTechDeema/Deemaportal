@@ -1,0 +1,10 @@
+project_id = "reeno"
+
+# Public entrypoints perform their own validation. Approval requires a 256-bit
+# single-use token; neither endpoint accepts a browser-supplied service key.
+[functions.register-company]
+verify_jwt = false
+[functions.approve-company]
+verify_jwt = false
+[functions.generate-job-content]
+verify_jwt = true
