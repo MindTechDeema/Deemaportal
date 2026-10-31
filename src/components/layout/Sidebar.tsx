@@ -1,8 +1,9 @@
-import { BriefcaseBusiness, LayoutDashboard, LogOut, Settings, Users } from 'lucide-react'
+import {BriefcaseBusiness,ExternalLink, LayoutDashboard, LogOut, Settings, Users } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/useAuth'
 
 const navigation = [
+  { label: 'Careers Portal', to: '/careers', icon: ExternalLink },
   { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
   { label: 'Jobs', to: '/jobs', icon: BriefcaseBusiness },
   { label: 'Applicants', to: '/applicants', icon: Users },
