@@ -8,3 +8,5 @@ verify_jwt = false
 verify_jwt = false
 [functions.generate-job-content]
 verify_jwt = true
+[functions.process-company-notifications]
+verify_jwt = false
