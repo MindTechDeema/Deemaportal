@@ -58,10 +58,11 @@ export async function createApplicationFileRecord(payload: ApplicationFileRpcPay
   if (error) throw friendly(error, 'Unable to save the uploaded file details.')
   return data as ApplicationFileRecord
 }
-export async function getApplications(): Promise<ApplicationWithJob[]> {
+export async function getApplications(jobId?: string): Promise<ApplicationWithJob[]> {
   const workspace = await getWorkspace()
   let query = requireSupabase().from('applications').select('*, job:jobs!inner(*, startup:startups(*), company:companies(id,name,slug))')
   query = workspace.account_type === 'company' ? query.eq('job.company_id', workspace.company_id) : query.is('job.company_id', null)
+  if (jobId !== undefined) query = query.eq('job_id', jobId)
   const { data, error } = await query.order('submitted_at', { ascending: false })
   if (error) throw friendly(error, 'Unable to load applications.')
   return (data ?? []) as ApplicationWithJob[]

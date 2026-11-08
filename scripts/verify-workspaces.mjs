@@ -92,3 +92,21 @@ test('bulk statuses use the atomic RPC and deduplicate application IDs', async (
   await apps.updateApplicationStatuses(['a','b','a'],'reviewing')
   assert.deepEqual(calls,[['update_workspace_application_statuses',{application_ids:['a','b'],new_status:'reviewing'}]])
 })
+
+for (const workspace of [{ account_type: 'company', company_id: 'company-a' }, { account_type: 'qstp' }]) {
+  test(workspace.account_type + ' job applicants keep both job and workspace query constraints', async () => {
+    const db = database([result([])])
+    const apps = await loadService('src/services/applicationsService.ts', { requireSupabase: () => db.client, getWorkspace: async () => workspace })
+    assert.deepEqual(await apps.getApplications('selected-job'), [])
+    assert.ok(db.calls.some(c => c[0] === 'eq' && c[1] === 'job_id' && c[2] === 'selected-job'))
+    assert.ok(db.calls.some(c => c[0] === (workspace.account_type === 'company' ? 'eq' : 'is') && c[1] === 'job.company_id' && c[2] === (workspace.company_id ?? null)))
+  })
+}
+
+test('unfiltered applicants still load the workspace without a job constraint', async () => {
+  const db = database([result([])])
+  const apps = await loadService('src/services/applicationsService.ts', { requireSupabase: () => db.client, getWorkspace: async () => ({ account_type: 'company', company_id: 'company-a' }) })
+  await apps.getApplications()
+  assert.equal(db.calls.some(c => c[0] === 'eq' && c[1] === 'job_id'), false)
+  assert.ok(db.calls.some(c => c[0] === 'eq' && c[1] === 'job.company_id' && c[2] === 'company-a'))
+})
